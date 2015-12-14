@@ -26,7 +26,7 @@ public class xorMain {
     static final double expectedBinaryOutputs[] = { 0.0, 1.0, 1.0, 0.0 };
     //static final double expectedBipolarOutputs[] = { -1.0, 1.0, 1.0, -1.0 };
     static double expectedBipolarOutputs[];
-    static final int MAX_EPOCHS = 10000;
+    static final int MAX_EPOCHS = 1;
 	static final double CRITERIA = 0.05;
 	
 	public static void main(String[] args) {		
@@ -34,14 +34,15 @@ public class xorMain {
 		final boolean isBinary = true;
 		final boolean DEBUG = false;
 		final boolean isRLNN = false;
+		boolean isLoaded = true;
 		double err = 0.0;
 		double totalError = 0.0;
 		int cnt = 0;
 		
 		bipolar_inputs = new double[2880][7]; //6 states + 1 action
 		expectedBipolarOutputs = new double[2880];
-		//NeuralNet nn = new NeuralNet(7,10);
-		NeuralNet nn = new NeuralNet(2,4);
+		//NeuralNet nn = new NeuralNet(7, 10, isLoaded);
+		NeuralNet nn = new NeuralNet(2, 4, isLoaded);
 		
 		String nnInputFile = "/Users/chwlo/Documents/workspace/EECE592/bin/myRLBot/MyRLBot.data/nn.txt";
 		BufferedReader br = null;
@@ -90,6 +91,12 @@ public class xorMain {
 					//bipolar_inputs[line][i] = Double.parseDouble(line.split(delimiter));
 				}
 			}
+			
+			/* LOAD TEST */
+			if (isLoaded) {
+				nn.load(nnWgtData);
+			}
+			
 			/* train neural network */			
 			for (int i=0; i < MAX_EPOCHS; i++) {
 				//System.out.println("binary input length"+binary_inputs.length);

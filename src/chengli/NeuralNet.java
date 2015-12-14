@@ -5,25 +5,31 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.io.FileOutputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.FileInputStream;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 
 public class NeuralNet {
 
 	/* Best configuration for RL NN training progress */
-    public static final double STEPSIZE = 0.01; 
+    //public static final double STEPSIZE = 0.01;
+    public static final double STEPSIZE = 0.2;
     public static final double MOMENTUM = 0.9;
-    public static final boolean DEBUG = false;
+    public static final boolean DEBUG = true;
 
     /* neural network layers */
     InputNeuron[] input;
     HiddenNeuron[] hidden;
     OutputNeuron output;
+    double[] nnWeights;
     
 	/**
 	 * Constructor - NeuralNet
 	 * @param inputs 		number of inputs
 	 * @param hiddenTotal 	total number of hidden neurons
 	 */
-    public NeuralNet(int inputs, int hiddenTotal) {
+    public NeuralNet(int inputs, int hiddenTotal, boolean load) {
 
     	/* add bias to input and hidden layers */
         input = new InputNeuron[inputs+1];
@@ -54,7 +60,7 @@ public class NeuralNet {
         /* create connections: input layer to hidden layer */
         for (int i = 0; i < input.length; i++) {
             for (int j = 0; j < hidden.length-1; j++) {
-                Connection c = new Connection(input[i], hidden[j]);
+                Connection c = new Connection(input[i], hidden[j], load);
                 input[i].addConnection(c);
                 hidden[j].addConnection(c);
             }
@@ -62,7 +68,7 @@ public class NeuralNet {
         
         /* create connections: hidden layer to output layer */
         for (int i = 0; i < hidden.length; i++) {
-            Connection c = new Connection(hidden[i], output);
+            Connection c = new Connection(hidden[i], output, load);
             hidden[i].addConnection(c);
             output.addConnection(c);
         }
@@ -129,6 +135,7 @@ public class NeuralNet {
         /* loop through each weights to OUTPUT neuron */
         for (int i = 0; i < connections.size(); i++) {
             Connection c = (Connection) connections.get(i);
+            System.out.println("--X hidden["+c.getFrom().getNeuronId()+"] to output["+c.getTo().getNeuronId()+"] weight: "+c.getWeight());
             Neuron neuron = c.getFrom();
             double output = neuron.getOutput();
             double deltaWeight = output*deltaOutput;
@@ -163,6 +170,7 @@ public class NeuralNet {
                 Connection c = (Connection) connections.get(j);               
                 if (c.getTo() == hidden[i]) {
                     double output = hidden[i].getOutput();
+                    System.out.println("--X input["+c.getFrom().getNeuronId()+"] to hidden["+c.getTo().getNeuronId()+"] weight: "+c.getWeight());
                     /* binary vs. bipolar */
                 	if (flag) {
                 		deltaHidden = output*(1-output);
@@ -196,21 +204,23 @@ public class NeuralNet {
     	} try {
     		PrintWriter pw = new PrintWriter(new FileOutputStream(temp));
     		// first two entries are the input layer size and hidden layer size pw.println(inputLayer.size());
-    		pw.println("=== OUTPUT LAYER ===");
+    		//pw.println("=== OUTPUT LAYER ===");
     		ArrayList connections = output.getConnections();
     		for (int i = 0; i < connections.size(); i++) {
     			Connection c = (Connection) connections.get(i);
-    	        Neuron neuron = c.getFrom();
-    	        pw.println("--> hidden["+c.getFrom().getNeuronId()+"] to output["+c.getTo().getNeuronId()+"] weight: "+c.getWeight());
+    	        //Neuron neuron = c.getFrom();
+    	        //pw.println("--> hidden["+c.getFrom().getNeuronId()+"] to output["+c.getTo().getNeuronId()+"] weight: "+c.getWeight());
+    	        pw.println(c.getWeight());
     	    }
-    		pw.println("=== HIDDEN LAYER ===");
+    		//pw.println("=== HIDDEN LAYER ===");
     		for (int i = 0; i < hidden.length; i++) {
     			connections = hidden[i].getConnections();
     			for (int j = 0; j < connections.size(); j++) {
                     Connection c = (Connection) connections.get(j);               
                     if (c.getTo() == hidden[i]) {
-                        Neuron neuron = c.getFrom();
-                        pw.println("--> input["+c.getFrom().getNeuronId()+"] to hidden["+c.getTo().getNeuronId()+"] weight: "+c.getWeight());
+                        //Neuron neuron = c.getFrom();
+                        //pw.println("--> input["+c.getFrom().getNeuronId()+"] to hidden["+c.getTo().getNeuronId()+"] weight: "+c.getWeight());
+                        pw.println(c.getWeight());
                     }
                 } /* end of for loop */
     		}
@@ -219,5 +229,55 @@ public class NeuralNet {
     		System.out.println("could not save the weight to a tmp.txt file: " + e); 
     		e.printStackTrace();
     	}
+    }
+    
+    public void load(String argFileName) throws IOException {
+    	File temp = new File(argFileName); 
+    	nnWeights = new double[17];
+    	if (!temp.exists()) {
+    		throw new IOException("File is not found...");
+    	}
+    	FileInputStream fin = new FileInputStream(temp);
+    	BufferedReader reader = new BufferedReader(new InputStreamReader(fin));
+    	try {
+    		String line;
+    		int count = 0;
+    		//line = reader.readLine();
+    		while ((line = reader.readLine()) != null) {
+    			nnWeights[count] = Double.parseDouble(line);
+        		//System.out.println(nnWeights[count]);
+    			count++;
+    		}
+    		
+    		//System.out.println("=== OUTPUT LAYER ===");
+    		ArrayList connections = output.getConnections();
+    		//System.out.println("connection size: "+connections.size());
+    		for (int i = 0; i < connections.size(); i++) {
+    			Connection c = (Connection) connections.get(i);
+    	        //Neuron neuron = c.getFrom();
+    			System.out.println("OUTPUT LAYER setting "+nnWeights[i]);
+    	        c.setWeight(nnWeights[i]);
+    	    }
+    		//System.out.println("=== HIDDEN LAYER ===");
+    		for (int i = 0; i < hidden.length; i++) {
+    			connections = hidden[i].getConnections();
+    			//System.out.println("connection size: "+connections.size());
+    			for (int j = 0; j < connections.size(); j++) {
+                    Connection c = (Connection) connections.get(j);               
+                    if (c.getTo() == hidden[i]) { // this reduces the connections to 3 output is not counted here
+                        //Neuron neuron = c.getFrom();
+                    	System.out.println("HIDDEN LAYER setting "+nnWeights[output.getConnections().size()+i*(connections.size()-1)+j]);
+                        c.setWeight(nnWeights[output.getConnections().size()+i*(connections.size()-1)+j]);
+                    }
+                }
+    		}
+    		
+    	} catch (Exception e) {
+    		throw new IOException("Errors in input file: " + e);
+    	} finally {
+    		fin.close();
+    		reader.close();
+    	}
+    	
     }
 }

@@ -20,7 +20,7 @@ public class Neuron {
     
 	/**
 	 * Constructor - A bias neuron
-	 * @param i		number of bias neuron
+	 * @param i		bias neuron output
 	 */
     public Neuron(int i) {
         output = i;
