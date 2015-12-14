@@ -46,7 +46,7 @@ public class xorMain {
 		NeuralNet nn = new NeuralNet(7, 10, isLoaded);
 		//NeuralNet nn = new NeuralNet(2, 4, isLoaded);
 		 
-		String nnInputFile = "/Users/chwlo/Documents/workspace/EECE592/bin/myRLBot/MyRLBot.data/nn.txt";
+		String nnInputFile = "/Users/chwlo/Documents/workspace/NCnn/data/RL-nn-friendly.txt";
 		BufferedReader br = null;
 		String line = "";
 		String delimiter = " ";
