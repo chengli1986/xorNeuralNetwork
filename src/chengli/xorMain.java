@@ -26,7 +26,7 @@ public class xorMain {
     static final double expectedBinaryOutputs[] = { 0.0, 1.0, 1.0, 0.0 };
     //static final double expectedBipolarOutputs[] = { -1.0, 1.0, 1.0, -1.0 };
     static double expectedBipolarOutputs[];
-    static final int MAX_EPOCHS = 1000;
+    static final int MAX_EPOCHS = 500;
 	static final double CRITERIA = 0.05;
 	
 	public static void main(String[] args) {		
@@ -34,7 +34,7 @@ public class xorMain {
 		final boolean isBinary = false;
 		final boolean DEBUG = false;
 		final boolean isRLNN = true;
-		boolean isLoaded = true;
+		boolean isLoaded = false;
 		
 		double err = 0.0;
 		double totalError = 0.0;
