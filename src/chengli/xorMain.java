@@ -26,24 +26,26 @@ public class xorMain {
     static final double expectedBinaryOutputs[] = { 0.0, 1.0, 1.0, 0.0 };
     //static final double expectedBipolarOutputs[] = { -1.0, 1.0, 1.0, -1.0 };
     static double expectedBipolarOutputs[];
-    static final int MAX_EPOCHS = 1;
+    static final int MAX_EPOCHS = 1000;
 	static final double CRITERIA = 0.05;
 	
 	public static void main(String[] args) {		
 		
-		final boolean isBinary = true;
+		final boolean isBinary = false;
 		final boolean DEBUG = false;
-		final boolean isRLNN = false;
+		final boolean isRLNN = true;
 		boolean isLoaded = true;
+		
 		double err = 0.0;
 		double totalError = 0.0;
 		int cnt = 0;
 		
 		bipolar_inputs = new double[2880][7]; //6 states + 1 action
 		expectedBipolarOutputs = new double[2880];
-		//NeuralNet nn = new NeuralNet(7, 10, isLoaded);
-		NeuralNet nn = new NeuralNet(2, 4, isLoaded);
 		
+		NeuralNet nn = new NeuralNet(7, 10, isLoaded);
+		//NeuralNet nn = new NeuralNet(2, 4, isLoaded);
+		 
 		String nnInputFile = "/Users/chwlo/Documents/workspace/EECE592/bin/myRLBot/MyRLBot.data/nn.txt";
 		BufferedReader br = null;
 		String line = "";
@@ -103,8 +105,14 @@ public class xorMain {
 				//System.out.println("bipolar input length"+bipolar_inputs.length);
 				/* go through each input sequences */
 				// ORIGINAL: xor only has 4 input sequences 
-				for (int p=0; p < binary_inputs.length; p++) {
-				//for (int p=0; p < bipolar_inputs.length; p++) {
+				int size = 0;
+				if (isRLNN) {
+					size = bipolar_inputs.length;
+				} else {
+					size = binary_inputs.length;
+				}
+					
+				for (int p=0; p < size; p++) {
 					double result = 0.0;
 					if (DEBUG)
 						System.out.println("\n\t\t*** Input Sequence "+p+" ***\n");
