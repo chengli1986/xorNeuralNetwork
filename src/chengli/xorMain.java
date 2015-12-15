@@ -26,14 +26,14 @@ public class xorMain {
     static final double expectedBinaryOutputs[] = { 0.0, 1.0, 1.0, 0.0 };
     //static final double expectedBipolarOutputs[] = { -1.0, 1.0, 1.0, -1.0 };
     static double expectedBipolarOutputs[];
-    static final int MAX_EPOCHS = 500;
+    static final int MAX_EPOCHS = 1000;
 	static final double CRITERIA = 0.05;
 	
 	public static void main(String[] args) {		
 		
-		final boolean isBinary = false;
+		final boolean isBinary = true;
 		final boolean DEBUG = false;
-		final boolean isRLNN = true;
+		final boolean isRLNN = false;
 		boolean isLoaded = false;
 		
 		double err = 0.0;
@@ -43,8 +43,8 @@ public class xorMain {
 		bipolar_inputs = new double[2880][7]; //6 states + 1 action
 		expectedBipolarOutputs = new double[2880];
 		
-		NeuralNet nn = new NeuralNet(7, 10, isLoaded);
-		//NeuralNet nn = new NeuralNet(2, 4, isLoaded);
+		NeuralNet nn = new NeuralNet(7, 10, isLoaded, 0.01, 0.9);
+		//NeuralNet nn = new NeuralNet(2, 4, isLoaded, 0.2, 0.9);
 		 
 		String nnInputFile = "/Users/chwlo/Documents/workspace/NCnn/data/RL-nn-friendly.txt";
 		BufferedReader br = null;
