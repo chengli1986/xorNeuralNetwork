@@ -31,10 +31,10 @@ public class xorMain {
 	
 	public static void main(String[] args) {		
 		
-		final boolean isBinary = true;
+		final boolean isBinary = false;
 		final boolean DEBUG = false;
-		final boolean isRLNN = false;
-		boolean isLoaded = false;
+		final boolean isRLNN = true;
+		boolean isLoaded = true;
 		
 		double err = 0.0;
 		double totalError = 0.0;
